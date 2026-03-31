@@ -1,0 +1,8 @@
+{
+  "name": "ley21369-cumplimiento",
+  "version": "1.0.0",
+  "description": "Sistema de seguimiento de cumplimiento Ley 21.369",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0"
+  }
+}
