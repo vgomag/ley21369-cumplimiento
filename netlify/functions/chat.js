@@ -3,9 +3,10 @@ export default async (req) => {
     return new Response('Method Not Allowed', { status: 405 });
   }
 
-  /* ── Verificar autenticación via Supabase token ── */
+  /* ── Verificar autenticación via clave de acceso ── */
   const authToken = req.headers.get('x-auth-token') || '';
-  if (!authToken) {
+  const validKey = Netlify.env.get('ACCESS_KEY') || 'umag2024';
+  if (!authToken || authToken !== validKey) {
     return json({ error: 'No autorizado — sesión requerida' }, 401);
   }
 

@@ -616,7 +616,7 @@ async function sendChat(){
     const _ctrl=new AbortController();
     const _tout=setTimeout(()=>_ctrl.abort(),30000);
     try{
-      const token=typeof session!=="undefined"?session?.access_token||"":"";
+      const token=typeof ACCESS_KEY!=="undefined"?ACCESS_KEY:"umag2024";
       const res=await fetch(CHAT_ENDPOINT,{
         method:"POST",
         headers:{"Content-Type":"application/json","x-auth-token":token},
@@ -667,7 +667,7 @@ async function generateReport(){
     const _ctrl=new AbortController();
     const _tout=setTimeout(()=>_ctrl.abort(),60000);
     try{
-      const token=typeof session!=="undefined"?session?.access_token||"":"";
+      const token=typeof ACCESS_KEY!=="undefined"?ACCESS_KEY:"umag2024";
       const res=await fetch(CHAT_ENDPOINT,{
         method:"POST",
         headers:{"Content-Type":"application/json","x-auth-token":token},
