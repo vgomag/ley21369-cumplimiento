@@ -283,7 +283,8 @@ function renderTabs(){
   el.querySelectorAll(".ley-tab").forEach(tab=>{
     tab.onclick=()=>{activeTab=tab.dataset.tab;renderTabs();renderBody()};
   });
-  /* SES tab placeholder (extensible) */
+  /* Re-inject SES tab after render (mod-ses-directrices.js adds it dynamically) */
+  if(typeof injectSesTab==="function")try{injectSesTab();}catch(e){}
 }
 
 function renderHeaderActions(){
@@ -293,7 +294,7 @@ function renderHeaderActions(){
     <button class="ley-btn" onclick="window._ley21369.showAddModal()">➕ Agregar</button>
     <button class="ley-btn" onclick="window._ley21369.generateReport()" ${items.length===0||generatingReport?"disabled":""}>${generatingReport?"⏳ Generando…":"📝 Informe IA"}</button>
     <button class="ley-btn" onclick="window._ley21369.exportExcel()" ${items.length===0?"disabled":""}>📊 Excel SES</button>
-`;
+    <button class="ley-btn" onclick="if(typeof openShareLeyModal==='function')openShareLeyModal();else showToast('Módulo de compartir no disponible')" style="color:#7c3aed">🔗 Compartir</button>`;
 }
 
 // ── Render Body ─────────────────────────────────────────────────────────────
