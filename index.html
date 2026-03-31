@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Ley 21.369 — Seguimiento de Cumplimiento</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --bg:#f5f5f7;
+  --surface:#ffffff;
+  --surface2:#fafafa;
+  --surface3:#f2f2f7;
+  --border:rgba(0,0,0,.08);
+  --border2:rgba(0,0,0,.12);
+  --gold:#4f46e5;
+  --gold-dim:#4338ca;
+  --gold-glow:rgba(79,70,229,.06);
+  --gold-glow2:rgba(79,70,229,.11);
+  --text:#111827;
+  --text-dim:#374151;
+  --text-muted:#9ca3af;
+  --accent:#4f46e5;
+  --green:#059669;
+  --red:#ef4444;
+  --blue:#4f46e5;
+  --radius:8px;
+  --radius-sm:5px;
+  --radius-lg:12px;
+  --radius-xl:16px;
+  --sidebar-width:220px;
+  --font-body:'Plus Jakarta Sans','Inter',system-ui,sans-serif;
+  --font-mono:'Geist Mono','DM Mono',ui-monospace,monospace;
+  --font-serif:'EB Garamond',Georgia,serif;
+  --shadow-xs:0 1px 2px rgba(0,0,0,.04);
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 6px rgba(0,0,0,.05),0 2px 4px rgba(0,0,0,.04);
+  --hover:rgba(79,70,229,.04);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;-webkit-font-smoothing:antialiased;}
+*{scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.1) transparent;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:4px;}
+
+/* ── LOGIN ── */
+.login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#f5f5f7 0%,#e8e7f0 100%);}
+.login-card{background:var(--surface);border-radius:var(--radius-xl);padding:40px 36px;width:100%;max-width:380px;box-shadow:var(--shadow-md);text-align:center;}
+.login-logo{font-size:48px;margin-bottom:8px;}
+.login-title{font-family:var(--font-serif);font-size:24px;font-weight:500;margin-bottom:4px;color:var(--text);}
+.login-subtitle{font-size:12px;color:var(--text-muted);margin-bottom:28px;}
+.login-input{width:100%;padding:10px 14px;border:1px solid var(--border2);border-radius:var(--radius);font-family:var(--font-body);font-size:13px;margin-bottom:12px;outline:none;transition:border-color .15s;}
+.login-input:focus{border-color:var(--accent);}
+.login-btn{width:100%;padding:11px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s;margin-top:4px;}
+.login-btn:hover{opacity:.9;}
+.login-btn:disabled{opacity:.5;cursor:not-allowed;}
+.login-error{color:#dc2626;font-size:12px;margin-bottom:10px;min-height:18px;}
+.login-footer{margin-top:18px;font-size:11px;color:var(--text-muted);}
+.login-footer a{color:var(--accent);cursor:pointer;text-decoration:none;}
+.login-footer a:hover{text-decoration:underline;}
+
+/* ── APP SHELL ── */
+.app-wrapper{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+.app-header{padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.app-header-left{display:flex;align-items:center;gap:12px;}
+.app-header-logo{font-size:24px;}
+.app-header-title{font-family:var(--font-serif);font-size:18px;font-weight:500;}
+.app-header-sub{font-size:10px;color:var(--text-muted);letter-spacing:.05em;}
+.app-header-right{display:flex;align-items:center;gap:12px;font-size:12px;}
+.app-header-user{color:var(--text-dim);font-weight:500;}
+.logout-btn{padding:5px 12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);font-size:11px;cursor:pointer;color:var(--text-muted);transition:.15s;}
+.logout-btn:hover{background:#fef2f2;color:#dc2626;border-color:#fca5a5;}
+
+.app-body{display:flex;flex:1;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-width);min-width:var(--sidebar-width);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sidebar-section-label{padding:14px 14px 6px;font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);font-weight:700;}
+.sidebar-nav-item{padding:8px 14px;font-size:12px;color:var(--text-dim);cursor:pointer;display:flex;align-items:center;gap:8px;transition:.15s;}
+.sidebar-nav-item:hover{background:var(--surface2);color:var(--text);}
+.sidebar-nav-item.active{background:var(--gold-glow);color:var(--accent);font-weight:600;}
+.nav-icon{font-size:14px;width:20px;text-align:center;}
+.sidebar-footer{margin-top:auto;padding:12px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--text-muted);}
+
+/* ── MAIN CONTENT ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+
+/* ── VIEWS ── */
+.view{display:none;flex-direction:column;overflow:hidden;height:100%;}
+.view.active{display:flex!important;}
+
+/* ── WELCOME VIEW ── */
+.welcome{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;text-align:center;padding:40px;}
+.welcome h1{font-family:var(--font-serif);font-size:28px;font-weight:400;margin-bottom:8px;}
+.welcome p{font-size:12.5px;color:var(--text-muted);margin-bottom:20px;line-height:1.6;}
+
+/* ── TOAST ── */
+#toastContainer{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:6px;}
+.toast{background:#1e293b;color:#f1f5f9;padding:8px 16px;border-radius:var(--radius);font-size:12px;opacity:0;transform:translateY(-10px);transition:all .3s;box-shadow:var(--shadow-md);}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .sidebar{display:none;}
+  .app-header-sub{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- Toast container -->
+<div id="toastContainer"></div>
+
+<!-- Login Page -->
+<div id="loginPage" class="login-page">
+  <div class="login-card">
+    <div class="login-logo">🛡️</div>
+    <div class="login-title">Ley 21.369</div>
+    <div class="login-subtitle">Sistema de Seguimiento de Cumplimiento Normativo<br>Acoso sexual, violencia y discriminación de género</div>
+    <div id="loginError" class="login-error"></div>
+    <div id="loginForm">
+      <input class="login-input" id="loginPass" type="password" placeholder="Ingrese la clave de acceso" autocomplete="current-password">
+      <button class="login-btn" id="loginBtn" onclick="doLogin()">Ingresar</button>
+    </div>
+  </div>
+</div>
+
+<!-- App Shell (hidden until login) -->
+<div id="appShell" class="app-wrapper" style="display:none">
+  <!-- Header -->
+  <div class="app-header">
+    <div class="app-header-left">
+      <span class="app-header-logo">🛡️</span>
+      <div>
+        <div class="app-header-title">Ley 21.369</div>
+        <div class="app-header-sub">SEGUIMIENTO DE CUMPLIMIENTO</div>
+      </div>
+    </div>
+    <div class="app-header-right">
+      <button class="logout-btn" onclick="doLogout()">Cerrar Sesión</button>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-section-label">Módulos</div>
+      <div class="sidebar-nav-item active" onclick="openLey21369();this.parentElement.querySelectorAll('.sidebar-nav-item').forEach(n=>n.classList.remove('active'));this.classList.add('active');">
+        <span class="nav-icon">🛡️</span>Implementación Ley 21.369
+      </div>
+      <div class="sidebar-section-label">Vistas</div>
+      <div class="sidebar-nav-item" onclick="switchTab('dashboard')"><span class="nav-icon">📊</span>Semáforo</div>
+      <div class="sidebar-nav-item" onclick="switchTab('kpi')"><span class="nav-icon">📈</span>KPI</div>
+      <div class="sidebar-nav-item" onclick="switchTab('alerts')"><span class="nav-icon">🔔</span>Alertas</div>
+      <div class="sidebar-nav-item" onclick="switchTab('checklist')"><span class="nav-icon">✅</span>Checklist</div>
+      <div class="sidebar-nav-item" onclick="switchTab('items')"><span class="nav-icon">📋</span>Requisitos</div>
+      <div class="sidebar-nav-item" onclick="switchTab('table')"><span class="nav-icon">📑</span>Tabla</div>
+      <div class="sidebar-nav-item" onclick="switchTab('docs')"><span class="nav-icon">📁</span>Documentos</div>
+      <div class="sidebar-nav-item" onclick="switchTab('chat')"><span class="nav-icon">💬</span>Chat IA</div>
+      <div class="sidebar-footer">
+        Ley 21.369 · Cumplimiento v1.0
+      </div>
+    </div>
+
+    <!-- Main content area -->
+    <div class="main">
+      <div class="view active" id="viewWelcome">
+        <div class="welcome">
+          <h1>🛡️ Implementación Ley 21.369</h1>
+          <p>Seguimiento de cumplimiento normativo<br>Acoso sexual, violencia y discriminación de género en educación superior</p>
+        </div>
+      </div>
+      <!-- viewLey21369 will be injected by the module -->
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Supabase Config ──
+const SB_URL='https://zgoxrzbkftzulsphmtfk.supabase.co';
+const SB_KEY='sb_publishable_qIWOIFlcCKbtr8_2Gf0FQA_73kSqD9-';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+const CHAT_ENDPOINT='/.netlify/functions/chat';
+
+let session=null;
+
+// ── Toast ──
+function showToast(msg){
+  const c=document.getElementById('toastContainer');
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  c.appendChild(t);requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),300);},2400);
+}
+
+// ── Markdown helper ──
+function md(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/```[\w]*\n?([\s\S]*?)```/g,'<pre><code>$1</code></pre>')
+  .replace(/`([^`]+)`/g,'<code>$1</code>')
+  .replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^# (.+)$/gm,'<h1>$1</h1>')
+  .replace(/\*\*([^\*]+)\*\*/g,'<strong>$1</strong>')
+  .replace(/\*([^\*]+)\*/g,'<em>$1</em>')
+  .replace(/^- (.+)$/gm,'<li>$1</li>').replace(/((?:<li>.*<\/li>\n?)+)/g,'<ul>$1</ul>')
+  .replace(/^\d+\. (.+)$/gm,'<li>$1</li>')
+  .replace(/^> (.+)$/gm,'<blockquote>$1</blockquote>')
+  .replace(/---/g,'<hr>')
+  .replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')
+  .replace(/^(?!<[hH\d]|<ul|<li|<pre|<blockquote|<hr)(.+)$/gm,'<p>$1</p>')
+  .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'')
+  .replace(/<iframe\b[^>]*>[\s\S]*?<\/iframe>/gi,'')
+  .replace(/\bon\w+\s*=\s*["'][^"']*["']/gi,'');}
+
+// ── View Management ──
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>{v.classList.toggle('active',v.id===id);});
+}
+
+// ── Tab Switching from Sidebar ──
+function switchTab(tabId){
+  if(typeof window._ley21369_switchTab==='function'){
+    window._ley21369_switchTab(tabId);
+  }
+  // Ensure the ley view is visible
+  showView('viewLey21369');
+}
+
+// ── Clave de acceso compartida (cámbiala aquí) ──
+const ACCESS_KEY='umag2024';
+
+// ── Auth: Login con clave simple ──
+function doLogin(){
+  const pass=document.getElementById('loginPass').value;
+  const errEl=document.getElementById('loginError');
+  errEl.textContent='';
+  if(!pass){errEl.textContent='Ingresa la clave de acceso';return;}
+  if(pass!==ACCESS_KEY){errEl.textContent='Clave incorrecta';return;}
+  sessionStorage.setItem('ley21369_auth','true');
+  enterApp();
+}
+
+// ── Auth: Logout ──
+function doLogout(){
+  sessionStorage.removeItem('ley21369_auth');
+  document.getElementById('appShell').style.display='none';
+  document.getElementById('loginPage').style.display='flex';
+  document.getElementById('loginPass').value='';
+}
+
+// ── Enter App ──
+function enterApp(){
+  document.getElementById('loginPage').style.display='none';
+  document.getElementById('appShell').style.display='flex';
+  // Auto-open the module
+  setTimeout(()=>{
+    if(typeof openLey21369==='function')openLey21369();
+  },100);
+}
+
+// ── Check existing session on load ──
+function checkSession(){
+  if(sessionStorage.getItem('ley21369_auth')==='true'){
+    enterApp();
+  }
+}
+
+// ── Enter on password field ──
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  checkSession();
+});
+</script>
+
+<!-- Module Ley 21.369 -->
+<script src="js/mod-ley21369.js"></script>
+
+</body>
+</html>
