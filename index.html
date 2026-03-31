@@ -180,7 +180,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <script>
 // ── Supabase Config ──
 const SB_URL='https://zgoxrzbkftzulsphmtfk.supabase.co';
-const SB_KEY='sb_publishable_qIWOIFlcCKbtr8_2Gf0FQA_73kSqD9-';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpnb3hyemJrZnR6dWxzcGhtdGZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMDY2MDYsImV4cCI6MjA4OTc4MjYwNn0.Kp_eL_AyuxcvtnRQeld2DuY0lsd1Etb4M9cnnZxGBZI';
 const sb=supabase.createClient(SB_URL,SB_KEY);
 const CHAT_ENDPOINT='/.netlify/functions/chat';
 
@@ -251,10 +251,15 @@ function doLogout(){
 function enterApp(){
   document.getElementById('loginPage').style.display='none';
   document.getElementById('appShell').style.display='flex';
-  // Auto-open the module
-  setTimeout(()=>{
-    if(typeof openLey21369==='function')openLey21369();
-  },100);
+  // Auto-open the module with retry
+  tryOpenModule(0);
+}
+function tryOpenModule(attempt){
+  if(typeof openLey21369==='function'){
+    openLey21369();
+  } else if(attempt<20){
+    setTimeout(()=>tryOpenModule(attempt+1),150);
+  }
 }
 
 // ── Check existing session on load ──

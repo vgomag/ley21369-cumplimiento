@@ -36,9 +36,11 @@ const h=t=>(t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;
 const fmtDate=d=>d?new Date(d).toLocaleDateString("es-CL"):"";
 const fmtSize=b=>b?(b/1024).toFixed(0)+" KB":"";
 const uid=()=>crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2);
+// Shared user ID (no Supabase Auth in standalone mode)
+const SHARED_UID='4af9147d-6f15-4da0-8552-7aded97380bc';
 async function getUser(){
-  const{data:{user}}=await sb.auth.getUser();
-  return user;
+  try{const{data:{user}}=await sb.auth.getUser();if(user)return user;}catch(e){}
+  return{id:SHARED_UID};
 }
 
 // ── CSS Injection ───────────────────────────────────────────────────────────
